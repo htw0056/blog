@@ -11,15 +11,15 @@
 
 ### 2. git config
 
-| 命令                                       | 作用        |
-| ---------------------------------------- | --------- |
-| git config user.name "your name"         | 设置局部的用户名称 |
-| git config user.email "your email"       | 设置局部的用户邮箱 |
-| git config --global user.name "your name" | 设置全局的用户名称 |
-| git config --global user.email "your email" | 设置全局的用户邮箱 |
-| git config --unset xxx                   | 删除变量xxx   |
-| git config --global --unset xxx          | 删除全局变量xxx |
-| git config --list                        | 查看变量列表    |
+| 命令                                       | 作用                   |
+| ---------------------------------------- | -------------------- |
+| git config user.name "your name"         | 设置局部的用户名称            |
+| git config user.email "your email"       | 设置局部的用户邮箱            |
+| git config --global user.name "your name" | 设置全局(用户级别)的用户名称      |
+| git config --local user.email "your email" | 设置当前项目的用户邮箱(项目级别,默认) |
+| git config --unset xxx                   | 删除变量xxx              |
+| git config --global --unset xxx          | 删除全局变量xxx            |
+| git config --list                        | 查看变量列表               |
 
 
 ### 3. git init
@@ -41,7 +41,6 @@
 | ----------- | ----------- |
 | git add 文件名 | 将文件提交到暂存区   |
 | git add -a  | 将所有文件提交到暂存区 |
-
 
 ### 6. git commit
 
