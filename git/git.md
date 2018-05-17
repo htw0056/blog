@@ -148,15 +148,15 @@ reset（中文意思是：重置），直接回到某次提交，中间的提交
 
 ### 17. 远程库相关命令
 
-| 命令                                                  | 作用                                                 |
-| ----------------------------------------------------- | ---------------------------------------------------- |
-| git clone git@github.com:htw0056/blog.git             | 克隆远程的库                                         |
-| git remote -v                                         | 查看本地和远程库的关联信息                           |
-| git remote add origin git@github.com:htw0056/blog.git | 远程库关联为origin                                   |
-| git remote remove origin                              | 删除已关联的远程库origin                             |
-| git branch --set-upstream dev origin/dev              | 关联本地dev和远端的dev分支                           |
-| git push [-u] origin master                           | 推送到远程的origin/master分支[-u 关联本地和远端分支] |
-| git pull origin master                                | 更新并merge远程origin/master分支                     |
-| git fetch origin master                               | 更新远程origin/master分支,但不merge                  |
+| 命令                                                  | 作用                                                   |
+| ----------------------------------------------------- | ------------------------------------------------------ |
+| git clone git@github.com:htw0056/blog.git             | 克隆远程的库                                           |
+| git remote -v                                         | 查看本地和远程库的关联信息                             |
+| git remote add origin git@github.com:htw0056/blog.git | 远程库关联为origin                                     |
+| git remote remove origin                              | 删除已关联的远程库origin                               |
+| git branch --set-upstream dev origin/dev              | 关联本地dev和远端的dev分支                             |
+| git push [-u] origin master                           | 推送到远程的origin/master分支[-u 关联本地和的远端分支] |
+| git pull origin master                                | 更新并merge远程origin/master分支                       |
+| git fetch origin master                               | 更新远程origin/master分支,但不merge                    |
 
 
