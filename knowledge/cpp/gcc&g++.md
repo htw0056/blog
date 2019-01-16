@@ -174,7 +174,7 @@ int main(int argc,char **argv) {
 
 hello.c使用到了hello1.c和hello2.c中的函数，可以把这两个函数组合为库，以供更多的程序作为组件来调用。下面采用编译为静态库和编译为动态库的方式分别进行说明。
 
-### 5.1 静态库使
+### 5.1 静态库使用
 
 - 将hello1.c和hello2.c分别编译为hello1.o和hello2.o
 
