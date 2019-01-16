@@ -170,3 +170,6 @@ public class HelloService {
 ### 4. 结语
 
 实际上，解决以上问题的方式还有很多，但孰优孰劣需要具体情况来分析。如果各位还有更好的解决方法，欢迎留言讨论。
+
+[代码](https://github.com/htw0056/blog/tree/master/java/code/cache-test)
+
