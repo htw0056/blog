@@ -489,3 +489,6 @@ public class CacheConfig3 {
 3. 在上文中并没有对key的生成规则进行详细的介绍，但这其实是十分重要的一点。由于CacheLoader的load方法只有一个参数key，所以我们必须将必要的信息(class，method，params)组合好传递给load方法，否则反射无法进行。由这个key出发，我们其实还有很多需要处理的地方：如果param并不是基本java类型，那么在key的生成过程中，我们要保证每个param的正确序列化；对于分隔符我们简单的使用了`#$`，如果参数中正好有这样的值，那么将导致反序列化出错，我们必须要进行转义处理以保证key的正确生成
 
 关于缓存还有许多地方可以研究，也许还有更好的方法来解决我们所遇到的问题~
+
+本文相关源码[下载](https://github.com/htw0056/blog/tree/master/java/code/caffeine-async)
+
