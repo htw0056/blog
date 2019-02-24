@@ -1,17 +1,17 @@
 # Spring Cache+Caffeine实现异步refresh
 
-> 一句话概括本文：用尽量简单优美的方式解决[Multiple Caffeine LoadingCaches added to Spring CaffeineCacheManager](https://stackoverflow.com/questions/44507309/multiple-caffeine-loadingcaches-added-to-spring-caffeinecachemanager)
+> 本文目标：用尽量简单优美的方式解决[Multiple Caffeine LoadingCaches added to Spring CaffeineCacheManager](https://stackoverflow.com/questions/44507309/multiple-caffeine-loadingcaches-added-to-spring-caffeinecachemanager)
 
 ### 1. 背景
 
-DIP平台主要提供两大核心功能:`人群服务`(圈选,放大,验证等)和`标签服务`(画像透视)。标签服务的核心就是提供画像实时OLAP服务，实现毫秒级别的画像透视。由于DIP平台每天产出的标签量非常巨大(数十个标签，十亿级别的量)，实时的OLAP查询在高并发下会达到**秒级**的延迟。通过调研实际的画像调用情况，我们发现画像透视查询在短时间内是有部分重复的，并且实际标签数据是天级别产出的（标签数据变化不频繁），因此对于画像透视查询可以在后台进行缓存来提高查询效率。
+DIP平台主要提供两大核心功能:`人群服务`(圈选,放大,验证等)和`标签服务`(画像透视)。标签服务的核心就是提供画像实时OLAP服务，实现毫秒级别的画像透视。由于DIP平台每天产出的标签量巨大(数十个标签，十亿级别的量)，实时的OLAP查询在高并发下会产生**秒级**的延迟。通过调研实际的画像调用情况，可以发现画像透视查询在短时间内是有部分重复的，并且实际标签数据是天级别产出的（标签数据变化不频繁），因此对于画像透视查询可以在后台进行缓存来提高查询效率。
 
-### 2. DIP缓存策略
+### 2. 画像透视缓存策略设计
 
 先简单了解一下后文会涉及到的cache相关内容，cache可以设置多种策略，比如`expire`,`refresh`:
 
-- expire: 过期策略，缓存如果不能满足expire，那么调用方法时将会阻塞直到返回结果（并缓存）
-- refresh: 刷新策略，在未过期但满足refresh条件时进行调用，会用最新的查询结果来更新旧的缓存
+- expire: 过期策略，缓存如果超过expire时间，那么调用方法时将会阻塞直到返回结果（并缓存）
+- refresh: 刷新策略，在未过期但满足refresh条件下进行调用，会用最新返回的查询结果来更新旧的缓存
 
 根据以上两种策略，我们设计出一种适合DIP的画像透视缓存缓存策略：
 
@@ -20,12 +20,12 @@ DIP平台主要提供两大核心功能:`人群服务`(圈选,放大,验证等)�
 2. 设置refresh为1天，在1天内数据不会被改变；在超过refresh时间，未超过expire时间情况下，在此期间调用相应方法，那么会先返回旧缓存值(并不被阻塞)，然后异步调用方法来更新缓存
 ```
 
-必须要注意的：refresh机制必须**先返回旧缓存值，然后异步调用方法来更新缓存**(如果refresh时被相应方法所阻塞，那么该refresh实质上就成了expire)
+必须要注意的：refresh机制必须**先返回旧缓存值，然后异步调用方法来更新缓存**(如果refresh时被相应方法所阻塞，那么该refresh实质上就成了expire)。
 
 ### 3. 基础实现
 
-1. Spring框架本身就提供了对于cache机制的支持，因此我们会选择直接依赖spring框架来实现，但实际上，spring无法提供refresh机制
-2. 在第一点的基础上，我们引入Caffeine，Caffeine提供的`expireAfterWrite`和`refreshAfterWrite`切好能满足我们希望实现的所有需求，最重要的是Caffeine的refresh机制就是先返回旧值然后[异步刷新](https://github.com/ben-manes/caffeine/wiki/Refresh)
+1. Spring框架本身就提供了对于cache机制的支持，因此首选依赖spring框架来实现DIP缓存策略（但实际上，spring无法提供refresh机制）
+2. 在第一点的基础上，我们引入Caffeine，Caffeine提供的`expireAfterWrite`和`refreshAfterWrite`恰好能满足我们希望实现的所有需求，最重要的是Caffeine的refresh机制就是先返回旧值然后[异步刷新](https://github.com/ben-manes/caffeine/wiki/Refresh)
 3. 好像结合Spring和Caffeine就能简单实现需求了，然而还是存在问题，使用Caffeine的refresh必须要实现`CacheLoader`,Caffeine使用CacheLoader的load方法来实现加载和reload方法实现refresh。在CacheLoader的具体实现内必须指明用于load的方法，所以当需要扩展时就会出现大量[冗余代码](https://stackoverflow.com/questions/44507309/multiple-caffeine-loadingcaches-added-to-spring-caffeinecachemanager)(每一个CacheLoader拥有一个只有细微差别的load实现)
 
 先来看看最基础的实现:
@@ -110,7 +110,7 @@ public class CacheConfig1 {
 }
 ```
 
-`CacheConfig`类提供`CacheManager`和`MyKeyGenerator`两个bean。
+`CacheConfig`类提供生成`CacheManager`和`MyKeyGenerator`两个bean。
 
 `MyKeyGenerator`：
 
@@ -118,9 +118,11 @@ MyKeyGenerator比较简单，就是生成cahce的key，生成规则就是class+n
 
 `CacheManager`：
 
-CacheManager生成一个Caffeine，该Caffeine实现10分钟过期,10秒钟refresh。而build参数必须提供一个CacheLoader的实现，Caffeine通过这个loader用来获取实际的值并缓存。在CacheLoader实现中，调用的方法最后一个参数(enableCache)为false，表示关闭缓存。如果没有该参数的存在，在CacheLoader中调用helloRepository.expensiveFunction1()方法时会递归进入缓存，导致流程进入死循环！
+CacheManager拥有一个Caffeine，该Caffeine实现10分钟过期,10秒钟refresh。而build参数必须提供一个CacheLoader的实现，Caffeine通过这个loader用来获取实际的值并缓存。在CacheLoader实现中，调用的方法最后一个参数(enableCache)为false，表示关闭缓存。如果没有该参数的存在，在CacheLoader中调用helloRepository.expensiveFunction1()方法时会递归进入缓存，导致流程进入死循环！
 
 > 我们也可以通过别的方式来实现避免递归进入缓存：实现两个方法，一个带有缓存注解供的方法a让外部使用，一个不带有缓存注解的方法b供Cache反射调用，方法a和b内容没有任何区别，代码显得相当冗余(丑陋)。
+
+通过观察代码`return return helloRepository.expensiveFunction1(info[2], info[3], false);(info[2], info[3], false);`，我们也能很容易地能意识到：这个cache只能用来缓存`helloRepository.expensiveFunction1()`方法（如果将缓存加在其他方法上，最后调用该cache必然会得到错误的结果）。
 
 #### 3.2 HelloRepository
 
@@ -184,7 +186,7 @@ public class HelloService {
 
 ### 4. multi cache实现（冗余版）
 
-当实现多个cache时，基于前者方案，我们可以通过简单的代码copy实现
+基于前者方案，我们可以通过简单的代码copy实现多cache
 
 #### 4.1 CacheConfig
 
@@ -482,13 +484,11 @@ public class CacheConfig3 {
 
 ### 6. 更多的改进？
 
-至此，我们已经提出了相对通用化的解法：使用反射来减少了代码的冗余。不过在最后，还有一些要点在想啰嗦几句：
+至此，我们已经提出了相对通用化的解法：使用反射来减少了代码的冗余。不过在最后，还有一些点可以衍生：
 
 1. 到目前为止，示例代码都是只提供了一个`CacheManager`，而该CacheManager内包含了多个Cache，每个Cache针对不同的方法进行缓存。而当我们使用反射来实现后，实际上，我们就已经能实现一个Cache对多个不同方法进行缓存(提供refresh)了。读者可以自行实现（其实几乎不用改多少代码）
 2. 通过反射来实现虽然减少了代码的冗余，但无形之中影响了代码的执行效率，两者取舍应由具体场景而定
-3. 在上文中并没有对key的生成规则进行详细的介绍，但这其实是十分重要的一点。由于CacheLoader的load方法只有一个参数key，所以我们必须将必要的信息(class，method，params)组合好传递给load方法，否则反射无法进行。由这个key出发，我们其实还有很多需要处理的地方：如果param并不是基本java类型，那么在key的生成过程中，我们要保证每个param的正确序列化；对于分隔符我们简单的使用了`#$`，如果参数中正好有这样的值，那么将导致反序列化出错，我们必须要进行转义处理以保证key的正确生成
-
-关于缓存还有许多地方可以研究，也许还有更好的方法来解决我们所遇到的问题~
+3. 在上文中并没有对key的生成规则进行详细的介绍，但这其实是十分重要的一点。由于CacheLoader的load方法只有一个参数key，所以我们必须将必要的信息(class，method，params)组合好传递给load方法，否则反射无法进行。由这个key出发，我们其实还有很多需要处理的地方：如果param并不是基本java类型，那么在key的生成过程中，我们要保证每个param的正确序列化；对于分隔符我们简单的使用了`#$`，如果参数中正好有这样的值，那么将导致反序列化出错，我们必须要进行转义处理以保证key的正确序列化和反序列化
 
 本文相关源码[下载](https://github.com/htw0056/blog/tree/master/java/code/caffeine-async)
 
