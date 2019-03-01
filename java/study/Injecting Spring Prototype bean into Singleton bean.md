@@ -257,13 +257,13 @@ public class ProxyConfigTest {
 
 ## 8. 总结
 
-| 方法                    | 备注                                   |
-| ----------------------- | -------------------------------------- |
-| ApplicationContextAware | 和spring框架耦合，不推荐使用           |
-| lookup                  | 推荐                                   |
-| javax.inject            | 需要外部类依赖                         |
-| ObjectFactory           | spring框架内提供                       |
-| Scoped Proxy            | 实现逻辑和其他四种不同，使用时需要注意 |
+| 方法                    | 备注                                                         |
+| ----------------------- | ------------------------------------------------------------ |
+| ApplicationContextAware | 和spring框架耦合，不推荐使用                                 |
+| lookup                  | 比较简单                                                     |
+| javax.inject            | 需要外部类依赖                                               |
+| ObjectFactory           | spring框架内提供，个人喜欢该实现方式                         |
+| Scoped Proxy            | 实现逻辑和其他四种不同，使用时需要注意:被代理对象**不能维护状态信息**，否则会出错 |
 
 > 参考文章:
 >
@@ -273,4 +273,4 @@ public class ProxyConfigTest {
 >
 > [Injecting Spring Prototype bean into Singleton bean](http://dolszewski.com/spring/accessing-prototype-bean-in-singleton)
 
-[本文源码]()
+[本文源码](https://github.com/htw0056/blog/tree/master/java/code/scope-test)
