@@ -38,7 +38,7 @@ maven遵循**约定优于配置**的原则，maven项目提供了默认的目录
 
 ## 3. Spring Boot与maven目录
 
-对于Spring Boot web项目，一般习惯将web资源也都直接放在`src/resources`目录下，它并不完全遵循maven目录规范。因此Spring Boot web项目打包后的web资源存放在`/WEB-INF/classes`目录下，而非通常情况下`根目录`。
+对于Spring Boot web项目，一般习惯将web资源也都直接放在`src/resources`目录下，它并不完全遵循maven目录规范。因此Spring Boot web项目打包后的web资源存放在`/WEB-INF/classes`目录下，而非通常情况下的`根目录`。
 
 所以，声明一个ViewResolver时，前缀目录一般设置为`WEB-INF/classes`下的目录：
 
