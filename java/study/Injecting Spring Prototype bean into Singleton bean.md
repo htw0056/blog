@@ -208,6 +208,8 @@ public class SingletonProxyBean {
 对PrototypeBean的scope设置代理`@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE,
 proxyMode = ScopedProxyMode.TARGET_CLASS)`，在SingletonProxyBean类中，直接注入PrototypeBean类即可。
 
+> proxyMode的设置：如果PrototypeBean是接口，则可以使用接口代理，设置为ScopedProxyMode.INTERFACES；如果PrototypeBean不是接口而是具体的类，那么就没法使用基于接口的代理了。此时，必须使用CGLib代理，也就是设置为ScopedProxyMode.TARGET_CLASS。
+
 使用代理方式实现，和上面的几种方法有些不同:
 
 1. `getPrototypeBean()`每次获取到的`PrototypeBean`对象都是一样的，因为返回的是代理对象
