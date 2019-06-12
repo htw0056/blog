@@ -41,6 +41,27 @@ public class QuickSort {
         return i;
 
     }
+  
+  	// 简化版
+     public static int partition(int[] list, int left, int right) {
+        int x = list[right];
+        int i = left - 1;
+        int temp;
+        for (int j = left; j <= right; j++) {  // < 改为 <=,将最后一次交换在循环内处理 
+            if (list[j] <= x) {   // 必须是包含=情况，否则错误
+                i++;
+                temp = list[j];
+                list[j] = list[i];
+                list[i] = temp;
+            }
+        }
+//        i++;
+//        temp = list[i];
+//        list[i] = list[right];
+//        list[right] = temp;
+        return i;
+
+    }
 
     public static void main(String[] args) {
         int[] array = {5, 3, 4, 1, 4, 32, 32, 5, 6, 2};
