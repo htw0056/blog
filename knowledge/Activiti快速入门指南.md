@@ -27,7 +27,7 @@
 
 本教程展示了使用Activiti将业务流程管理（BPM）嵌入到您的应用程序中的简单性。 您将构建一个命令行应用程序，并将BPMN逻辑嵌入到该应用程序中。
 
-Activiti拥有先进的流程设计工具，可将更复杂的BPM逻辑嵌入到您的应用程序中。 这些工具包括基于Eclipse和基于Web的BPMN编辑器等。 为简洁起见，本快速入门仅使用Activiti的Java API。
+Activiti拥有先进的流程设计工具，可将复杂的BPM逻辑嵌入到您的应用程序中。 这些工具包括基于Eclipse和基于Web的BPMN编辑器等。 为简洁起见，本快速入门仅使用Activiti的Java API。
 
 > 有关其他Activiti BPM工具的介绍，请参阅：
 >
@@ -89,7 +89,7 @@ Activiti拥有先进的流程设计工具，可将更复杂的BPM逻辑嵌入到
 - Database (com.h2database) – the H2 database
 - Logging (org.slf4j) – Simple Logging Facade for Java
 
-在创建构建目录时，本教程假定您的目录结构符合标准的Maven目录结构：
+在创建项目目录时，本教程假定您的目录结构遵循标准的Maven目录结构：
 
 | 路径                             | 描述         |
 | -------------------------------- | ------------ |
@@ -191,7 +191,7 @@ public class OnboardingRequest {
 | ----- | ------------------------------------------------ |
 | 3-4   | Activiti流程引擎和配置                           |
 | 5,9   | 独立环境的配置助手（例如，不使用依赖关系管理器） |
-| 9-15  | 使用基于内存的h2嵌入式数据库创建Process Engine   |
+| 9-15  | 使用基于内存的嵌入式数据库h2创建Process Engine   |
 | 16-18 | 显示Process Engine配置和Activiti版本             |
 
 > Activiti支持依赖注入
@@ -203,7 +203,7 @@ public class OnboardingRequest {
 > - 数据库脚本可在“`$actUnzipedPack`/database/create”查看
 > - Activiti用户指南（提供多种开发和管理信息）
 
-为了支持IDE和平台独立以及快速入门的简单性，添加[“fat jar”](http://stackoverflow.com/questions/19150811/what-is-a-fat-jar)配置如下：
+为了支持IDE和平台独立以及快速入门的简单性，添加以下[“fat jar”](http://stackoverflow.com/questions/19150811/what-is-a-fat-jar)配置：
 
 **File: $mvnProject/pom.xml**
 
@@ -759,7 +759,7 @@ BEGIN Onboarding [onboarding] Sun Nov 27 21:36:21 EST 2016
 COMPLETE Onboarding [onboarding] Sun Nov 27 21:36:38 EST 2016
 ```
 
-> 发现输入的years-experience为2，所以在经过“Years of Experience”判断后，执行脚本任务 “Generic and Automated Data Entry”并结束流程。
+> 当years-experience输入为2时，在经过“Years of Experience”判断后，选择执行脚本任务 “Generic and Automated Data Entry”并结束流程。
 
 
 
@@ -794,7 +794,7 @@ BEGIN Onboarding [onboarding] Sun Nov 27 21:39:26 EST 2016
 COMPLETE Onboarding [onboarding] Sun Nov 27 21:39:54 EST 2016
 ```
 
-> 发现输入的years-experience为5，所以在经过“Years of Experience”判断后，执行“Personalized Introduction and Data Entry”流程并结束流程。
+> 当years-experience输入为5时，在经过“Years of Experience”判断后，执行“Personalized Introduction and Data Entry”流程并结束流程。
 
 本示例虽然简单，但此嵌入式示例展示了您的应用程序如何将流程逻辑外部化为基于标准的建模和代码友好的开发模型。
 
@@ -802,7 +802,7 @@ COMPLETE Onboarding [onboarding] Sun Nov 27 21:39:54 EST 2016
 
 ## 6. 编写Service Task
 
-如前所述，我们的流程有一个任务“Generic and Automated Data Entry”（一种虚拟的后端服务），当入职年数不超过3时，执行该活动。这是一个“脚本任务”。在这种情况下，执行了一小段Javascript代码，来表示系统处理步骤。现在，我们将把这个脚本任务迁移到Java中，以演示利用Java如何满足各种流程要求。
+如前所述，我们的流程有一个任务“Generic and Automated Data Entry”（一种虚拟的后端服务），当入职年数不超过3时，执行该活动。这是一个“脚本任务”。在这种情况下，执行了一小段Javascript代码，来表示系统处理步骤。现在，我们将把这个脚本任务移植到Java中，以演示利用Java如何满足各种流程要求。
 
 创建一个新的Java类，如下所示：
 
