@@ -1,6 +1,6 @@
 # Activiti快速入门指南
 
-> 本文翻译自 https://www.activiti.org/quick-start。
+> 本文翻译自 https://www.activiti.org/quick-start
 
 
 
@@ -19,7 +19,7 @@
 | `$actUnzipedPack`            | 在[http://www.activiti.org/download.html](http://www.activiti.org/download.html)页面下载解压后的文件根目录地址 |
 | `$quickStartJavaProjectName` | Java项目的名称，推荐使用`ActivitiDeveloperQuickStart`        |
 | `…`                          | 为简洁起见，省略部分信息                                     |
-| `$actVer`                    | 当前使用的Activiti版本                                       |
+| `$actVer`                    | 当前运行的Activiti版本                                       |
 
 
 
@@ -89,7 +89,7 @@ Activiti拥有先进的流程设计工具，可将更复杂的BPM逻辑嵌入到
 - Database (com.h2database) – the H2 database
 - Logging (org.slf4j) – Simple Logging Facade for Java
 
-在引用构建目录时，本教程假定您的maven项目的标准Maven构建路径：
+在创建构建目录时，本教程假定您的目录结构符合标准的Maven目录结构：
 
 | 路径                             | 描述         |
 | -------------------------------- | ------------ |
