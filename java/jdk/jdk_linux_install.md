@@ -8,7 +8,7 @@
 java version "1.6.0_24"
 OpenJDK Runtime Environment (IcedTea6 1.11.1) (rhel-1.45.1.11.1.el6-x86_64)
 OpenJDK 64-Bit Server VM (build 20.0-b12, mixed mode)
-```  
+```
 如果正常显示结果，说明你的linux已经安装了java环境
 
 ```
