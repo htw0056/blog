@@ -117,4 +117,53 @@ openssl rsa -in private.pem -check
 | pkcs8  | 公钥 | pkcs1    | 公钥   | openssl rsa -pubin -in public.pkcs8  -RSAPublicKey_out -out public.pkcs1 |
 | pkcs1  | 公钥 | pkcs8    | 公钥   | openssl rsa -RSAPublicKey_in -in public.pkcs1  -pubout -out public.pkcs8 |
 
+### 5. 自签名证书
+
+```shell
+# 1. 生成私钥
+openssl genrsa -out ca.key 2048
+# 2. 生成CSR
+openssl req \
+    -subj "/C=CN/ST=Zhengjiang/L=Wenzhou/O=htw/OU=htw Software/CN=htwca/emailAddress=test@test.com" \
+    -new \
+    -key ca.key \
+    -out ca.csr
+# 3. 生成自签名证书
+openssl x509 \
+    -req \
+    -days 365 \
+    -in ca.csr \
+    -signkey ca.key \
+    -out ca.crt    
+```
+
+```bash
+简化版:
+# 1. 生成私钥
+openssl genrsa -out ca.key 2048
+# 2. 生成自签名证书(合并req和x509步骤)
+openssl req -new -x509 -days 365 -key ca.key -out ca.crt -subj "/C=CN/ST=Zhengjiang/L=Wenzhou/O=htw/OU=htw Software/CN=htwca/emailAddress=test@test.com"
+```
+
+### 6. 私有CA签名证书
+
+```shell
+# 1. 生成私钥
+openssl genrsa -out server.key 2048
+# 2. 生成CSR
+openssl req \
+    -subj "/C=CN/ST=Zhengjiang/L=Wenzhou/O=htw/OU=htw Software/CN=htw0056.com/emailAddress=test@test.com" \
+    -new \
+    -key server.key \
+    -out server.csr
+# 3. 利用CA签名证书
+openssl x509 \
+    -req \
+    -days 365 \
+    -in server.csr \
+    -CA ca.crt \
+    -CAkey ca.key \
+    -set_serial 01 \
+    -out server.crt  
+```
 
